@@ -1,0 +1,90 @@
+﻿@model Forum.Entity.Models.Question
+
+@{
+    ViewData["Title"] = "Soru Detayı";
+}
+
+<div class="container mt-4">
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>@Model.Title</h2>
+        </div>
+        <div class="card-body">
+            <p>@Model.Description</p>
+            <small class="text-muted">Tarih: @Model.CreatedAt</small>
+        </div>
+    </div>
+
+    <h4>Yorumlar / Cevaplar</h4>
+    <div id="comments-list">
+        @if (Model.Comments != null)
+        {
+            @foreach (var comment in Model.Comments)
+            {
+                <div class="alert alert-secondary">
+                    @comment.Content
+                    <br />
+                    <small>@comment.CreatedAt</small>
+                </div>
+            }
+        }
+        else
+        {
+            <p>Henüz yorum yapılmamış.</p>
+        }
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+        <label>Cevabınız:</label>
+        <textarea id="txtComment" class="form-control" rows="3"></textarea>
+        <button id="btnSend" class="btn btn-success mt-2">Gönder</button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#btnSend").click(function () {
+            // 1. Textarea'daki yazıyı al
+            var yorumIcerigi = $("#txtComment").val();
+            var soruId = @Model.Id; // Sorunun ID'sini al
+
+            if (yorumIcerigi === "") {
+                alert("Lütfen bir şeyler yazın!");
+                return;
+            }
+
+            // 2. AJAX İsteği Gönder
+            $.ajax({
+                url: '/Home/AddComment', // Controller'daki metoda git
+                type: 'POST',
+                data: { content: yorumIcerigi, questionId: soruId },
+                success: function (response) {
+                    if (response.success) {
+                        // 3. Başarılı olursa sayfayı yenilemeden yorumu ekrana ekle
+                        var yeniYorumHTML = `
+                            <div class="alert alert-success">
+                                ${yorumIcerigi}
+                                <br/>
+                                <small>Az önce</small>
+                            </div>`;
+
+                        $("#comments-list").append(yeniYorumHTML);
+                        $("#txtComment").val(""); // Kutuyu temizle
+                        alert("Yorumunuz eklendi!");
+                    } else {
+                        alert("Hata: " + response.message);
+                    }
+                },
+                error: function () {
+                    alert("Bir hata oluştu. Giriş yaptığınızdan emin olun.");
+                }
+            });
+        });
+
+    });
+</script>

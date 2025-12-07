@@ -1,0 +1,32 @@
+﻿@model Forum.Web.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">Giriş Yap</div>
+                <div class="card-body">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+                    <form asp-action="Login" method="post">
+                        <div class="mb-3">
+                            <label>Email</label>
+                            <input asp-for="Email" class="form-control" type="email" required />
+                        </div>
+                        <div class="mb-3">
+                            <label>Şifre</label>
+                            <input asp-for="Password" class="form-control" type="password" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Giriş</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
