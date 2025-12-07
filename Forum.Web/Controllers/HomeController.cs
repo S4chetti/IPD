@@ -19,13 +19,21 @@ namespace Forum.Web.Controllers
 
         public IActionResult Index()
         {
-            var questions = _questionRepo.GetAll();
+            // BURASI DEĞİŞTİ: "Category" tablosunu da getir diyoruz.
+            var questions = _questionRepo.GetAll("Category,User,Comments"); 
             return View(questions);
         }
 
         public IActionResult Details(int id)
         {
-            var question = _questionRepo.GetAll().FirstOrDefault(x => x.Id == id);
+            // Burası çok önemli! Zincirleme veri çekiyoruz:
+            // 1. Category -> Kategorisini getir.
+            // 2. User -> Soruyu yazanı getir.
+            // 3. Comments -> Yorumları getir.
+            // 4. Comments.User -> Yorumu yazan kişileri de getir (İç içe include).
+            var question = _questionRepo.GetAll("Category,User,Comments,Comments.User")
+                                        .FirstOrDefault(x => x.Id == id);
+
             return View(question);
         }
 

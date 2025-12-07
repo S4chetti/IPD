@@ -21,10 +21,15 @@
         {
             @foreach (var comment in Model.Comments)
             {
-                <div class="alert alert-secondary">
-                    @comment.Content
-                    <br />
-                    <small>@comment.CreatedAt</small>
+                <div class="card mb-2">
+                    <div class="card-body py-2">
+                        <p class="mb-1">@comment.Content</p>
+                        <small class="text-muted">
+                            <i class="fas fa-user-edit"></i> @(comment.User?.Name ?? "Misafir")
+                            |
+                            <i class="far fa-clock"></i> @comment.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                        </small>
+                    </div>
                 </div>
             }
         }

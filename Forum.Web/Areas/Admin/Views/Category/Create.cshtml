@@ -1,0 +1,31 @@
+﻿@model Forum.Entity.Models.Category
+
+@{
+    ViewData["Title"] = "Yeni Kategori";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Yeni Kategori Oluştur</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Kategori Adı</label>
+                        <input asp-for="Name" class="form-control" required placeholder="Örn: Yazılım, Donanım..." />
+                    </div>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Kaydet
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

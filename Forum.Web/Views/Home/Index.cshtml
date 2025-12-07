@@ -1,8 +1,56 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<Forum.Entity.Models.Question>
+
+@{
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h2>Forum Konuları</h2>
+<hr />
+
+@if (User.Identity.IsAuthenticated)
+{
+    <p>
+        <a asp-controller="Question" asp-action="Create" class="btn btn-success mb-3">Yeni Konu Aç</a>
+    </p>
+}
+else
+{
+    <p class="alert alert-info">Yeni konu açmak için lütfen <a asp-controller="Account" asp-action="Login">giriş yapın</a>.</p>
+}
+
+
+<table class="table table-hover forum-table border shadow-sm">
+    <thead class="table-primary">
+        <tr>
+            <th>Konu Başlığı</th>
+            <th style="width: 15%;">Yazar</th>
+            <th style="width: 15%;">Cevap Sayısı</th>
+            <th style="width: 15%;">Son Aktivite</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var question in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-controller="Home" asp-action="Details" asp-route-id="@question.Id" class="forum-link">
+                        @question.Title
+                    </a>
+                    <br />
+                    <small class="text-muted">Kategori: @question.Category.Name</small>
+                </td>
+                <td>
+                    <span class="badge bg-secondary">
+                        <i class="fas fa-user"></i> @(question.User?.Name ?? "Bilinmiyor")
+                    </span>
+                </td>
+                <td>
+                    <span class="badge bg-info text-dark">@(question.Comments?.Count() ?? 0)</span>
+                </td>
+                <td>
+                    @question.CreatedAt.ToShortDateString()
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

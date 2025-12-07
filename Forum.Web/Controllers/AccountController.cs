@@ -54,5 +54,43 @@ namespace Forum.Web.Controllers
             await HttpContext.SignOutAsync("CookieAuth");
             return RedirectToAction("Login");
         }
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // 1. Bu e-posta ile daha önce kayıt olunmuş mu?
+            var existingUser = _userRepo.GetAll().FirstOrDefault(x => x.Email == model.Email);
+            if (existingUser != null)
+            {
+                ViewBag.Error = "Bu e-posta adresi zaten kullanılıyor.";
+                return View(model);
+            }
+
+            // 2. Yeni kullanıcıyı oluştur
+            var newUser = new User
+            {
+                Name = model.Name,
+                Email = model.Email,
+                Password = model.Password, // Gerçek projelerde şifreler hashlenmelidir!
+                Role = "User",
+                CreatedDate = DateTime.Now
+            };
+
+            // 3. Veritabanına kaydet
+            _userRepo.Add(newUser);
+
+            // 4. Giriş sayfasına yönlendir
+            return RedirectToAction("Login");
+        }
     }
 }

@@ -2,13 +2,14 @@
 
 namespace Forum.Data
 {
-    // <T> demek: Bu yapı Generic olacak. Yani T yerine User da gelebilir, Question da.
     public interface IRepository<T> where T : class
     {
-        List<T> GetAll();           // Hepsini getir
-        T GetById(int id);          // ID'ye göre tek bir kayıt getir
-        void Add(T entity);         // Ekle
-        void Update(T entity);      // Güncelle
-        void Delete(int id);        // ID'ye göre Sil
+        // "includeProps" parametresi ekledik, varsayılanı null
+        List<T> GetAll(string? includeProps = null); 
+        
+        T GetById(int id);
+        void Add(T entity);
+        void Update(T entity);
+        void Delete(int id);
     }
 }

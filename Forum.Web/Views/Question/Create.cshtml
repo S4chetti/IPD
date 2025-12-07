@@ -1,0 +1,49 @@
+﻿@model Forum.Entity.Models.Question
+
+@{
+    ViewData["Title"] = "Yeni Konu Aç";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📝 Yeni Konu Oluştur</h4>
+                </div>
+                <div class="card-body">
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form asp-action="Create" method="post">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Konu Başlığı</label>
+                            <input asp-for="Title" class="form-control" placeholder="Sorunuzu kısaca özetleyin..." required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Kategori</label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories" required>
+                                <option value="">-- Bir Kategori Seçin --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Detaylı Açıklama</label>
+                            <textarea asp-for="Description" class="form-control" rows="6" placeholder="Sorunuzun detaylarını buraya yazın..." required></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Konuyu Yayınla</button>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">İptal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

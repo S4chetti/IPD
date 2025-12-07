@@ -17,9 +17,21 @@ namespace Forum.Data
             _dbSet = _context.Set<T>();
         }
 
-        public List<T> GetAll()
+        // GetAll metodunun yeni hali:
+        public List<T> GetAll(string? includeProps = null)
         {
-            return _dbSet.ToList();
+            IQueryable<T> query = _dbSet;
+
+            // Eğer dışarıdan "Şunu da dahil et" denildiyse:
+            if (!string.IsNullOrEmpty(includeProps))
+            {
+                foreach (var includeProp in includeProps.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+
+            return query.ToList();
         }
 
         public T GetById(int id)
