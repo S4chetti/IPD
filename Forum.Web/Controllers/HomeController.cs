@@ -64,5 +64,32 @@ namespace Forum.Web.Controllers
             _commentRepo.Add(comment);
             return Json(new { success = true });
         }
+
+        // Yorum Silme İşlemi
+        public IActionResult DeleteComment(int id)
+        {
+            // 1. Silinecek yorumu bul
+            var comment = _commentRepo.GetById(id);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            // 2. Güvenlik Kontrolü: Şu anki kullanıcı bu yorumun sahibi mi?
+            // (Admin ise her şeyi silebilir)
+            var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+
+            if (comment.UserId != currentUserId && !User.IsInRole("Admin"))
+            {
+                // Yetkisiz işlem denemesi!
+                return RedirectToAction("Details", new { id = comment.QuestionId });
+            }
+
+            // 3. Sil ve geri dön
+            _commentRepo.Delete(id);
+
+            return RedirectToAction("Details", new { id = comment.QuestionId });
+        }
     }
 }
