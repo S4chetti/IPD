@@ -68,7 +68,6 @@ namespace Forum.Web.Controllers
 
             // 5. Frontend'e JSON formatında "Başarılı" mesajı ve eklenen veriyi dön
             // (Eklenen yorumun HTML'ini JS tarafında oluşturacağız)
-            return Json(new { success = true });
             // Veritabanına kaydettikten sonra ID oluşur, onu da gönderiyoruz:
             return Json(new { success = true, commentId = comment.Id });
         }
