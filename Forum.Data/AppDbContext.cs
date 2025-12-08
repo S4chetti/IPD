@@ -5,7 +5,6 @@ namespace Forum.Data
 {
     public class AppDbContext : DbContext
     {
-        // AŞAĞIDAKİ METOT ÇOK ÖNEMLİ, BURAYI KONTROL EDİN:
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
@@ -16,14 +15,12 @@ namespace Forum.Data
         public DbSet<Comment> Comments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Kullanıcı silindiğinde Yorumları OTOMATİK SİLME (Döngüyü kırmak için)
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.User)
                 .WithMany(u => u.Comments)
                 .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.NoAction); // Cascade yerine NoAction yapıyoruz
+                .OnDelete(DeleteBehavior.NoAction); // Cascade yerine NoAction 
 
-            // Kullanıcı silindiğinde Soruları OTOMATİK SİLME (Opsiyonel güvenlik)
             modelBuilder.Entity<Question>()
                 .HasOne(q => q.User)
                 .WithMany(u => u.Questions)
