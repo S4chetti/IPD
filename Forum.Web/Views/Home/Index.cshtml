@@ -37,7 +37,9 @@ else
                         @question.Title
                     </a>
                     <br />
-                    <small class="text-muted">Kategori: @question.Category.Name</small>
+                    <small class="text-muted">
+                        Kategori: @(question.Category?.Name ?? "Kategori Yok")
+                    </small>
                 </td>
                 <td>
                     <span class="badge bg-secondary">

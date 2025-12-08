@@ -40,19 +40,21 @@ namespace Forum.Web.Controllers
         [HttpPost]
         public IActionResult AddComment(string content, int questionId)
         {
+            // 1. Kullanıcı giriş yapmış mı kontrol et
             if (!User.Identity.IsAuthenticated)
             {
-                return Json(new { success = false, message = "Lütfen giriş yapınız." });
+                return Json(new { success = false, message = "Lütfen önce giriş yapınız." });
             }
 
+            // 2. Kullanıcı ID'sini bul
             var userIdClaim = User.FindFirst("UserId");
             if (userIdClaim == null)
             {
-                return Json(new { success = false, message = "Kullanıcı ID bulunamadı." });
+                return Json(new { success = false, message = "Kullanıcı bilgisi alınamadı." });
             }
+            int userId = int.Parse(userIdClaim.Value);
 
-            var userId = int.Parse(userIdClaim.Value);
-
+            // 3. Yorumu oluştur
             var comment = new Comment
             {
                 Content = content,
@@ -61,8 +63,14 @@ namespace Forum.Web.Controllers
                 CreatedAt = DateTime.Now
             };
 
+            // 4. Veritabanına kaydet
             _commentRepo.Add(comment);
+
+            // 5. Frontend'e JSON formatında "Başarılı" mesajı ve eklenen veriyi dön
+            // (Eklenen yorumun HTML'ini JS tarafında oluşturacağız)
             return Json(new { success = true });
+            // Veritabanına kaydettikten sonra ID oluşur, onu da gönderiyoruz:
+            return Json(new { success = true, commentId = comment.Id });
         }
 
         // Yorum Silme İşlemi

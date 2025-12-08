@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering; // Dropdown listesi için
 
 namespace Forum.Web.Controllers
 {
-    [Authorize] // Bu controller'daki işlemleri sadece giriş yapanlar görebilir
+    [Authorize]
     public class QuestionController : Controller
     {
         private readonly IRepository<Question> _questionRepo;

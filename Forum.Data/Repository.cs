@@ -20,11 +20,13 @@ namespace Forum.Data
         // GetAll metodunun yeni hali:
         public List<T> GetAll(string? includeProps = null)
         {
+            // Veritabanı setini sorgulanabilir hale getir
             IQueryable<T> query = _dbSet;
 
-            // Eğer dışarıdan "Şunu da dahil et" denildiyse:
+            // Eğer "şunu da dahil et" denildiyse (Örn: "Category,User")
             if (!string.IsNullOrEmpty(includeProps))
             {
+                // Virgülle ayrılanları tek tek ekle
                 foreach (var includeProp in includeProps.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(includeProp);

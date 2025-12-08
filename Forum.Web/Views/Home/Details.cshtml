@@ -16,12 +16,13 @@
     </div>
 
     <h4>Yorumlar / Cevaplar</h4>
+
     <div id="comments-list">
-        @if (Model.Comments != null)
+        @if (Model.Comments != null && Model.Comments.Any())
         {
             @foreach (var comment in Model.Comments)
             {
-                <div class="card mb-2 shadow-sm">
+                <div class="card mb-2 shadow-sm" id="comment-@comment.Id">
                     <div class="card-body py-2">
                         <div class="d-flex justify-content-between align-items-center">
 
@@ -38,13 +39,14 @@
                             {
                                 var currentUserId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
 
-                                // Eğer giren kişi yorumun sahibiyse VEYA Admin ise butonu göster
+                                // Yorum sahibi veya Admin ise görsün
                                 if (currentUserId == comment.UserId || User.IsInRole("Admin"))
                                 {
-                                    <a asp-controller="Home" asp-action="DeleteComment" asp-route-id="@comment.Id"
+                                    // response.commentId kısmına dikkat et!
+                                    <a href="/Home/DeleteComment/${response.commentId}"
                                        class="btn btn-outline-danger btn-sm"
-                                       onclick="return confirm('Bu yorumu silmek istediğinize emin misiniz?');">
-                                        <i class="fas fa-trash-alt"></i> Sil
+                                       onclick="return confirm('Silmek istediğinize emin misiniz?');">
+                                        <i class="fas fa-trash-alt"></i>
                                     </a>
                                 }
                             }
@@ -56,17 +58,28 @@
         }
         else
         {
-            <p>Henüz yorum yapılmamış.</p>
+            <div id="no-comment-warning" class="alert alert-light">Henüz yorum yapılmamış. İlk cevabı sen yaz!</div>
         }
     </div>
 
     <hr />
 
-    <div class="form-group">
-        <label>Cevabınız:</label>
-        <textarea id="txtComment" class="form-control" rows="3"></textarea>
-        <button id="btnSend" class="btn btn-success mt-2">Gönder</button>
+    <div class="card bg-light">
+        <div class="card-body">
+            <h5 class="card-title">Cevap Yaz</h5>
+            <form id="commentForm">
+                <div class="form-group mb-3">
+                    <textarea id="txtComment" class="form-control" rows="3" placeholder="Yorumunuzu buraya yazın..."></textarea>
+                </div>
+                <button type="button" id="btnSend" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Gönder
+                </button>
+            </form>
+        </div>
     </div>
+
+    <hr />
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -114,3 +127,79 @@
 
     });
 </script>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            // Tıklama olayını sadece BİR KERE tanımlıyoruz
+            $("#btnSend").off().click(function () {
+
+                var yorumIcerigi = $("#txtComment").val();
+                var soruId = @Model.Id;
+
+                if (yorumIcerigi.trim() === "") {
+                    alert("Lütfen bir yorum yazın!");
+                    return;
+                }
+
+                var $btn = $(this);
+                $btn.prop("disabled", true).text("Gönderiliyor...");
+
+                $.ajax({
+                    url: '/Home/AddComment',
+                    type: 'POST',
+                    data: { content: yorumIcerigi, questionId: soruId },
+                    success: function (response) {
+                        if (response.success) {
+
+                            var now = new Date();
+                            var zaman = now.toLocaleDateString() + " " + now.toLocaleTimeString().substring(0,5);
+
+                            // Sadece BEYAZ KART tasarımını kullanıyoruz
+                            var yeniYorumHTML = `
+                                <div class="card mb-2 shadow-sm border-start border-success border-3">
+                                    <div class="card-body py-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <p class="mb-1 fw-bold text-dark">${yorumIcerigi}</p>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user-check"></i> Ben (Az önce)
+                                                    |
+                                                    <i class="far fa-clock"></i> ${zaman}
+                                                </small>
+                                            </div>
+
+                                            <a href="/Home/DeleteComment/${response.commentId}"
+                                               class="btn btn-outline-danger btn-sm"
+                                               onclick="return confirm('Silmek istediğinize emin misiniz?');">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>`;
+
+                            $("#no-comment-warning").remove();
+                            $("#comments-list").append(yeniYorumHTML);
+                            $("#txtComment").val("");
+
+                            // Popup uyarısını da kaldırabiliriz, zaten ekranda beliriyor
+                            // alert("Yorumunuz eklendi!");
+
+                        } else {
+                            alert("Hata: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Sunucuyla iletişim kurulamadı.");
+                    },
+                    complete: function () {
+                        $btn.prop("disabled", false).html('<i class="fas fa-paper-plane"></i> Gönder');
+                    }
+                });
+            });
+
+        });
+    </script>
+}
