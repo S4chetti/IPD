@@ -24,24 +24,30 @@ namespace Forum.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            // Email ile kullanıcıyı bul
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Bu email ile kayıtlı kullanıcı bulunamadı.");
                 return View(model);
             }
 
-            // Şifre kontrolü ve giriş (PasswordSignInAsync hashlemeyi kendi yapar)
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
+            // 1. Önce kullanıcıyı Email ile bul
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Bu email adresiyle kayıtlı kullanıcı bulunamadı.");
+                return View(model);
+            }
+
+            // 2. Kullanıcı bulunduysa şifreyi kontrol et
+            // user.UserName parametresini veriyoruz çünkü SignInManager UserName bekler
+            var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, false, false);
 
             if (result.Succeeded)
             {
                 return RedirectToAction("Index", "Home");
             }
 
+            // 3. Başarısız olursa hata mesajı ekle
             ModelState.AddModelError("", "Email veya şifre hatalı.");
             return View(model);
         }

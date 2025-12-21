@@ -1,56 +1,79 @@
-﻿@model Forum.Web.Models.RegisterViewModel
-
+﻿@model RegisterViewModel
 @{
     ViewData["Title"] = "Kayıt Ol";
+    Layout = null;
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="fas fa-user-plus"></i> Kayıt Ol</h4>
-                </div>
-                <div class="card-body">
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Kayıt Ol - Forum</title>
 
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger">@ViewBag.Error</div>
-                    }
+    <link href="~/sb-admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="~/sb-admin/css/sb-admin-2.min.css" rel="stylesheet">
+</head>
 
-                    <form asp-action="Register" method="post">
+<body class="bg-gradient-primary">
+    <div class="container">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <div class="row">
+                    <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+                    <div class="col-lg-7">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Hesap Oluştur!</h1>
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Ad Soyad</label>
-                            <input asp-for="Name" class="form-control" placeholder="Adınız Soyadınız" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <form class="user" asp-action="Register" method="post">
+
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input asp-for="Name" class="form-control form-control-user" placeholder="Adınız">
+                                        <span asp-validation-for="Name" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input asp-for="SurName" class="form-control form-control-user" placeholder="Soyadınız">
+                                        <span asp-validation-for="SurName" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input asp-for="Email" type="email" class="form-control form-control-user" placeholder="Email Adresi">
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input asp-for="Password" type="password" class="form-control form-control-user" placeholder="Şifre">
+                                        <span asp-validation-for="Password" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input asp-for="ConfirmPassword" type="password" class="form-control form-control-user" placeholder="Şifre Tekrar">
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-user btn-block">
+                                    Hesabı Kaydet
+                                </button>
+                            </form>
+                            <hr>
+                            <div class="text-center">
+                                <a class="small" href="/Account/Login">Zaten hesabın var mı? Giriş Yap!</a>
+                            </div>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">E-Posta Adresi</label>
-                            <input asp-for="Email" class="form-control" type="email" placeholder="ornek@email.com" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Şifre</label>
-                            <input asp-for="Password" class="form-control" type="password" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Şifre Tekrar</label>
-                            <input asp-for="ConfirmPassword" class="form-control" type="password" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                        </div>
-
-                        <button type="submit" class="btn btn-success w-100">Kayıt Ol</button>
-                    </form>
-                </div>
-                <div class="card-footer text-center">
-                    <small>Zaten hesabınız var mı? <a asp-action="Login">Giriş Yapın</a></small>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <script src="~/sb-admin/vendor/jquery/jquery.min.js"></script>
+    <script src="~/sb-admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/sb-admin/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="~/sb-admin/js/sb-admin-2.min.js"></script>
+</body>
+</html>

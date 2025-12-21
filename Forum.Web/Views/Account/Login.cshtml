@@ -1,32 +1,53 @@
-﻿@model Forum.Web.Models.LoginViewModel
-
+﻿@model LoginViewModel
 @{
     ViewData["Title"] = "Giriş Yap";
+    Layout = null; // Admin teması kullanmasın diye
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">Giriş Yap</div>
-                <div class="card-body">
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger">@ViewBag.Error</div>
-                    }
-                    <form asp-action="Login" method="post">
-                        <div class="mb-3">
-                            <label>Email</label>
-                            <input asp-for="Email" class="form-control" type="email" required />
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>Giriş Yap - Forum</title>
+    <link href="~/sb-admin/css/sb-admin-2.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-primary">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-12 col-md-9">
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Hoş Geldiniz!</h1>
+                            </div>
+                            
+                            <form class="user" asp-action="Login" method="post">
+                                
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                                
+                                <div class="form-group">
+                                    <input asp-for="Email" class="form-control form-control-user" placeholder="Email Adresi...">
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                                <div class="form-group">
+                                    <input asp-for="Password" type="password" class="form-control form-control-user" placeholder="Şifre">
+                                    <span asp-validation-for="Password" class="text-danger small"></span>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-user btn-block">
+                                    Giriş Yap
+                                </button>
+                            </form>
+                            
+                            <hr>
+                            <div class="text-center">
+                                <a class="small" href="/Account/Register">Hesabın yok mu? Kayıt Ol!</a>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label>Şifre</label>
-                            <input asp-for="Password" class="form-control" type="password" required />
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Giriş</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</body>
+</html>
