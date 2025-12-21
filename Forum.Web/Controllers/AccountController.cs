@@ -1,24 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Forum.Data;
-using Forum.Entity.Models;
+﻿using Forum.Entity.Models;
 using Forum.Web.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IRepository<User> _userRepo;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public AccountController(IRepository<User> userRepo)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            _userRepo = userRepo;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
-        [HttpGet]
         public IActionResult Login()
         {
             return View();
@@ -27,71 +24,76 @@ namespace Forum.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            var user = _userRepo.GetAll().FirstOrDefault(x => x.Email == model.Email && x.Password == model.Password);
+            if (!ModelState.IsValid) return View(model);
 
-            if (user != null)
+            // Email ile kullanıcıyı bul
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
             {
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.Name),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim("UserId", user.Id.ToString())
-                };
+                ModelState.AddModelError("", "Bu email ile kayıtlı kullanıcı bulunamadı.");
+                return View(model);
+            }
 
-                var identity = new ClaimsIdentity(claims, "CookieAuth");
-                var principal = new ClaimsPrincipal(identity);
+            // Şifre kontrolü ve giriş (PasswordSignInAsync hashlemeyi kendi yapar)
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
 
-                await HttpContext.SignInAsync("CookieAuth", principal);
-
+            if (result.Succeeded)
+            {
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Error = "E-posta veya şifre hatalı.";
-            return View();
+            ModelState.AddModelError("", "Email veya şifre hatalı.");
+            return View(model);
         }
 
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync("CookieAuth");
-            return RedirectToAction("Login");
-        }
-        [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            if (!ModelState.IsValid) return View(model);
 
-            // 1. Bu e-posta ile daha önce kayıt olunmuş mu?
-            var existingUser = _userRepo.GetAll().FirstOrDefault(x => x.Email == model.Email);
-            if (existingUser != null)
-            {
-                ViewBag.Error = "Bu e-posta adresi zaten kullanılıyor.";
-                return View(model);
-            }
-
-            // 2. Yeni kullanıcıyı oluştur
-            var newUser = new User
+            var user = new User()
             {
                 Name = model.Name,
+                SurName = model.SurName,
+                UserName = model.Email, // Identity'de UserName zorunludur, Email'i kullanabiliriz
                 Email = model.Email,
-                Password = model.Password, // Gerçek projelerde şifreler hashlenmelidir!
-                Role = "User",
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.Now,
+                ImageId = "default-profile.png" // Varsayılan resim
             };
 
-            // 3. Veritabanına kaydet
-            _userRepo.Add(newUser);
+            // CreateAsync metodu şifreyi otomatik hashler ve kaydeder
+            var result = await _userManager.CreateAsync(user, model.Password);
 
-            // 4. Giriş sayfasına yönlendir
+            if (result.Succeeded)
+            {
+                // Kayıt başarılıysa otomatik giriş yap
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Hata varsa ekrana bas (Örn: Şifre çok kısa)
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
+        }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

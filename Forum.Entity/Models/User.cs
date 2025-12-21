@@ -1,19 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
 
 namespace Forum.Entity.Models
 {
-    // IdentityUser<int> diyerek ID'nin integer kalmasını sağlıyoruz (varsayılan string GUID'dir)
+    // IdentityUser<int> ile Identity özelliklerini (Password, Email vb.) alıyoruz.
     public class User : IdentityUser<int>
     {
-        // IdentityUser'da olmayan kendi özel alanların:
         public string? Name { get; set; }
         public string? SurName { get; set; }
-        public DateTime CreateDate { get; set; } = DateTime.Now;
 
-        // Profil resmi için dosya yolu
+        // --- İŞTE EKSİK OLAN SATIR BURASI ---
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        // ------------------------------------
+
         public string? ImageId { get; set; }
 
         // İlişkiler
