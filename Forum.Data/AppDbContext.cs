@@ -1,33 +1,39 @@
-﻿using Forum.Entity.Models; // Modellerinizin olduğu namespace
+﻿using Forum.Entity.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace Forum.Data
 {
-    public class AppDbContext : DbContext
+    // IdentityDbContext<User, IdentityRole<int>, int> kullanıyoruz çünkü User id'miz int.
+    public class AppDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
-        public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.User)
-                .WithMany(u => u.Comments)
-                .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.NoAction); // Cascade yerine NoAction 
+        // User tablosunu eklemeye gerek yok, IdentityDbContext içinde Users olarak var.
 
-            modelBuilder.Entity<Question>()
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            // Identity tablolarının (Users, Roles, Logins vb.) oluşması için bu satır ŞART:
+            base.OnModelCreating(builder);
+
+            // Senin mevcut ilişkilerin:
+            builder.Entity<Question>()
                 .HasOne(q => q.User)
                 .WithMany(u => u.Questions)
                 .HasForeignKey(q => q.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade); // Kullanıcı silinirse soruları da silinsin (isteğe bağlı)
 
-            base.OnModelCreating(modelBuilder);
+            builder.Entity<Comment>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Comments)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.NoAction); // Yorumlarda döngüsel silmeyi engellemek için NoAction
         }
     }
 }

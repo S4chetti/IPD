@@ -1,15 +1,20 @@
-﻿using System.Xml.Linq;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace Forum.Entity.Models
 {
-    public class User
+    // IdentityUser<int> diyerek ID'nin integer kalmasını sağlıyoruz (varsayılan string GUID'dir)
+    public class User : IdentityUser<int>
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string Role { get; set; } = "User"; // Admin veya User
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        // IdentityUser'da olmayan kendi özel alanların:
+        public string? Name { get; set; }
+        public string? SurName { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
+
+        // Profil resmi için dosya yolu
+        public string? ImageId { get; set; }
 
         // İlişkiler
         public List<Question> Questions { get; set; }

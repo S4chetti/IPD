@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Forum.Data;
 using Forum.Entity.Models;
 using Forum.Web.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Forum.Web.Controllers
 {
