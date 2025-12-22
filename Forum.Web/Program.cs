@@ -1,4 +1,6 @@
 ﻿using Forum.Data;
+using Forum.Data.Abstract;
+using Forum.Data.Concrete;
 using Forum.Entity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +31,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 // Repository Servisi
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+// Repository Tanımlamaları
+builder.Services.AddScoped<IRepository<Question>, Repository<Question>>(); // Generic olan
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();     // <-- YENİ EKLEDİĞİMİZ ÖZEL OLAN
 
 
 // Veritabanı Servisi

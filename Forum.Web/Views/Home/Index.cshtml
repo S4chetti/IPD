@@ -50,7 +50,7 @@ else
                     <span class="badge bg-info text-dark">@(question.Comments?.Count() ?? 0)</span>
                 </td>
                 <td>
-                    @question.CreatedAt.ToShortDateString()
+                    @question.CreatedDate.ToShortDateString()
                 </td>
             </tr>
         }

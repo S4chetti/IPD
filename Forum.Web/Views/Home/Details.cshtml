@@ -11,7 +11,7 @@
         </div>
         <div class="card-body">
             <p>@Model.Description</p>
-            <small class="text-muted">Tarih: @Model.CreatedAt</small>
+            <small class="text-muted">Tarih: @Model.CreatedDate</small>
         </div>
     </div>
 
@@ -31,7 +31,7 @@
                                 <small class="text-muted">
                                     <i class="fas fa-user-edit"></i> @(comment.User?.Name ?? "Misafir")
                                     |
-                                    <i class="far fa-clock"></i> @comment.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                                    <i class="far fa-clock"></i> @comment.CreatedDate.ToString("dd.MM.yyyy HH:mm")
                                 </small>
                             </div>
 

@@ -1,49 +1,63 @@
-﻿@model Forum.Entity.Models.Question
-
+﻿@model QuestionCreateViewModel
 @{
-    ViewData["Title"] = "Yeni Konu Aç";
+    ViewData["Title"] = "Soru Sor";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">📝 Yeni Konu Oluştur</h4>
-                </div>
-                <div class="card-body">
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Yeni Soru Oluştur</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
 
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger">@ViewBag.Error</div>
-                    }
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-                    <form asp-action="Create" method="post">
+                    <div class="form-group">
+                        <label>Soru Başlığı</label>
+                        <input asp-for="Title" class="form-control" placeholder="Sorunuzun başlığı...">
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Konu Başlığı</label>
-                            <input asp-for="Title" class="form-control" placeholder="Sorunuzu kısaca özetleyin..." required />
+                    <div class="form-group">
+                        <label>Kategori Seçin</label>
+                        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
+                            <option value="">-- Kategori Seç --</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Detaylı Açıklama</label>
+                        <textarea asp-for="Description" class="form-control" rows="5" placeholder="Sorunuzun detayları..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Görsel Ekle (Opsiyonel)</label>
+                        <div class="custom-file">
+                            <input asp-for="Image" type="file" class="custom-file-input" id="customFile">
+                            <label class="custom-file-label" for="customFile">Dosya Seç...</label>
                         </div>
+                        <span asp-validation-for="Image" class="text-danger"></span>
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Kategori</label>
-                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories" required>
-                                <option value="">-- Bir Kategori Seçin --</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Detaylı Açıklama</label>
-                            <textarea asp-for="Description" class="form-control" rows="6" placeholder="Sorunuzun detaylarını buraya yazın..." required></textarea>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">Konuyu Yayınla</button>
-                            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">İptal</a>
-                        </div>
-                    </form>
-                </div>
+                    <button type="submit" class="btn btn-primary btn-block mt-4">
+                        <i class="fas fa-paper-plane"></i> Soruyu Gönder
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Dosya seçildiğinde adını label'a yazdır
+        $(".custom-file-input").on("change", function() {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+}
