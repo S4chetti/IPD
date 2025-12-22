@@ -1,31 +1,39 @@
-﻿@model Forum.Entity.Models.Category
-
+﻿@model Category
 @{
     ViewData["Title"] = "Yeni Kategori";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Yeni Kategori Oluştur</h6>
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Yeni Kategori Ekle</h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div class="form-group">
+                <label>Kategori Adı</label>
+                <input asp-for="Name" class="form-control" placeholder="Örn: Yazılım">
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="card-body">
-                <form asp-action="Create" method="post">
 
-                    <div class="form-group mb-3">
-                        <label class="form-label">Kategori Adı</label>
-                        <input asp-for="Name" class="form-control" required placeholder="Örn: Yazılım, Donanım..." />
-                    </div>
-
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-check"></i> Kaydet
-                    </button>
-
-                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
-                </form>
+            <div class="form-group">
+                <label>Açıklama</label>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Kategori açıklaması..."></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-        </div>
+
+            <button type="submit" class="btn btn-success btn-icon-split">
+                <span class="icon text-white-50">
+                    <i class="fas fa-check"></i>
+                </span>
+                <span class="text">Kaydet</span>
+            </button>
+
+            <a href="/Admin/Category/Index" class="btn btn-secondary btn-icon-split ml-2">
+                <span class="icon text-white-50">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span class="text">Geri Dön</span>
+            </a>
+        </form>
     </div>
 </div>

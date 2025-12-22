@@ -1,56 +1,100 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization; // Giriş kontrolü için
-using System.Security.Claims; // Kullanıcı ID'sini almak için
-using Forum.Data;
+﻿using Forum.Data;
 using Forum.Entity.Models;
-using Microsoft.AspNetCore.Mvc.Rendering; // Dropdown listesi için
+using Forum.Web.Models; // ViewModel'i buradan çekeceğiz
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System.IO; // Dosya kaydetmek için şart!
 
 namespace Forum.Web.Controllers
 {
-    [Authorize]
+    [Authorize] // Sadece giriş yapmış kullanıcılar erişebilir
     public class QuestionController : Controller
     {
-        private readonly IRepository<Question> _questionRepo;
-        private readonly IRepository<Category> _categoryRepo;
+        private readonly AppDbContext _context;
+        private readonly UserManager<User> _userManager;
+        private readonly IWebHostEnvironment _hostEnvironment; // <--- YENİ EKLENDİ
 
-        public QuestionController(IRepository<Question> questionRepo, IRepository<Category> categoryRepo)
+        // Constructor'a hostEnvironment parametresini ekliyoruz
+        public QuestionController(AppDbContext context, UserManager<User> userManager, IWebHostEnvironment hostEnvironment)
         {
-            _questionRepo = questionRepo;
-            _categoryRepo = categoryRepo;
+            _context = context;
+            _userManager = userManager;
+            _hostEnvironment = hostEnvironment; // <--- YENİ EKLENDİ
         }
 
         // GET: Soru Ekleme Sayfasını Göster
-        [HttpGet]
+        [HttpGet] // Sayfa ilk açıldığında çalışır
         public IActionResult Create()
         {
-            // Kategorileri Dropdown (Açılır Liste) için hazırla
-            ViewBag.Categories = new SelectList(_categoryRepo.GetAll(), "Id", "Name");
+            // Kategorileri Dropdown (Açılır Liste) için hazırlıyoruz
+            // "Id" veritabanına gidecek değer, "Name" kullanıcının göreceği değer
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
-        // POST: Formdan gelen veriyi kaydet
-        [HttpPost]
-        public IActionResult Create(Question question)
+        [HttpPost] // Form gönderildiğinde çalışır
+        [ValidateAntiForgeryToken] // Güvenlik önlemi
+        public async Task<IActionResult> Create(QuestionCreateViewModel model)
         {
-            // Kullanıcı ID'sini otomatik al (Formdan gelmez, güvenlik için buradan alırız)
-            var userIdClaim = User.FindFirst("UserId");
-            if (userIdClaim != null)
+            if (ModelState.IsValid)
             {
-                question.UserId = int.Parse(userIdClaim.Value);
+                string uniqueFileName = null;
+
+                // ADIM 1: RESİM VAR MI KONTROL ET
+                if (model.Image != null)
+                {
+                    // Resimlerin kaydedileceği ana klasör: wwwroot/img/questions
+                    // WebRootPath bize 'wwwroot' klasörünün tam yolunu verir.
+                    string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "img", "questions");
+
+                    // Eğer klasör yoksa oluştur (Hata almamak için)
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    // Dosya adı çakışmasın diye rastgele bir GUID ekliyoruz.
+                    // Örn: "deneme.jpg" -> "b123-asda-2131_deneme.jpg" olur.
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+
+                    // Tam dosya yolu (C:/Projects/.../wwwroot/img/questions/....jpg)
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    // Resmi sunucuya kopyala (Kaydet)
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.Image.CopyToAsync(fileStream);
+                    }
+                }
+
+                // ADIM 2: KULLANICIYI BUL
+                var user = await _userManager.GetUserAsync(User);
+
+                // ADIM 3: VERİTABANI NESNESİNİ OLUŞTUR
+                // ViewModel'deki verileri gerçek Entity'ye aktarıyoruz.
+                Question newQuestion = new Question
+                {
+                    Title = model.Title,
+                    Description = model.Description,
+                    CategoryId = model.CategoryId,
+                    UserId = user.Id,
+                    CreatedDate = DateTime.Now,
+                    ImageName = uniqueFileName // Resmin sadece adını veritabanına yazıyoruz!
+                };
+
+                // ADIM 4: KAYDET
+                _context.Questions.Add(newQuestion);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index", "Home");
             }
 
-            question.CreatedAt = DateTime.Now;
-
-            // Basit doğrulama (Kategori seçilmiş mi, başlık var mı?)
-            if (string.IsNullOrEmpty(question.Title) || string.IsNullOrEmpty(question.Description))
-            {
-                ViewBag.Error = "Lütfen başlık ve açıklama giriniz.";
-                ViewBag.Categories = new SelectList(_categoryRepo.GetAll(), "Id", "Name");
-                return View(question);
-            }
-
-            _questionRepo.Add(question);
-            return RedirectToAction("Index", "Home"); // Başarılıysa ana sayfaya git
+            // Eğer hata varsa (örneğin başlık boşsa), kategorileri tekrar yükle ve formu geri göster
+            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
+            return View(model);
         }
     }
 }
