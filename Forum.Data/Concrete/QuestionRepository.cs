@@ -3,7 +3,7 @@ using Forum.Entity.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-namespace Forum.Data.Concrete
+namespace Forum.Data.Concrete // Namespace'e dikkat
 {
     public class QuestionRepository : Repository<Question>, IQuestionRepository
     {
@@ -16,13 +16,13 @@ namespace Forum.Data.Concrete
 
         public Question GetQuestionWithDetails(int id)
         {
-            // Detay sayfasında null hatası almamak için tüm ilişkileri (Include) yüklüyoruz
+            // İŞTE SİHİRLİ KISIM BURASI: Include metotları ile bağlı verileri çekiyoruz.
             return _context.Questions
-                .Where(x => x.Id == id)
-                .Include(x => x.User)       // Soruyu soran
-                .Include(x => x.Category)   // Kategorisi
-                .Include(x => x.Comments)   // Yorumları
-                .ThenInclude(c => c.User)   // Yorumu yazan kullanıcılar
+                .Where(q => q.Id == id)
+                .Include(q => q.User)       // Soruyu soran
+                .Include(q => q.Category)   // Kategorisi
+                .Include(q => q.Comments)   // Yorumlar
+                .ThenInclude(c => c.User)   // Yorumu yazan kişiler
                 .FirstOrDefault();
         }
     }

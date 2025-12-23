@@ -1,11 +1,13 @@
 ﻿using Forum.Entity.Models;
 
-namespace Forum.Data.Abstract
+using Forum.Entity.Models;
+using System.Collections.Generic;
+
+namespace Forum.Data.Abstract // Namespace'e dikkat
 {
-    // IRepository<Question>'dan miras alarak standart metotları da kapsıyoruz
+    // Standart IRepository'den miras alıyoruz + Özel metodumuzu ekliyoruz
     public interface IQuestionRepository : IRepository<Question>
     {
-        // Ekstra özel metodumuz
         Question GetQuestionWithDetails(int id);
     }
 }

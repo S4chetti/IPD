@@ -1,30 +1,33 @@
-﻿using Forum.Data.Abstract; // Bunu ekle
+﻿using Forum.Data.Abstract; // Bunu eklemeyi unutma
+using Forum.Data.Concrete;
+using Forum.Entity.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Forum.Web.Controllers
 {
     public class HomeController : Controller
     {
-        // Service yerine doğrudan Repository kullanıyoruz (Daha pratik)
-        private readonly IQuestionRepository _questionRepo;
+        // ARTIK GENERIC DEGIL, OZEL REPOSITORY KULLANIYORUZ
 
-        public HomeController(IQuestionRepository questionRepo)
-        {
-            _questionRepo = questionRepo;
-        }
+private readonly IQuestionRepository _questionRepository; // <-- DOĞRU
 
-        public IActionResult Index()
+    public HomeController(IQuestionRepository questionRepository) // <-- DOĞRU
+    {
+        _questionRepository = questionRepository;
+    }
+
+    public IActionResult Index()
         {
-            // Anasayfada tüm sorular
-            return View(_questionRepo.GetAll());
+            return View(_questionRepository.GetAll());
         }
 
         public IActionResult Details(int id)
         {
-            // --- HATA VEREN KISIM BURAYDI, ARTIK ÇALIŞACAK ---
-            var question = _questionRepo.GetQuestionWithDetails(id);
-            // -------------------------------------------------
+            // Eski Kod: var question = _questionRepository.GetById(id); (YETERSİZ)
 
+            // YENİ KOD: (Yazarı, Yorumları, Resmi her şeyi getirir)
+            var question = _questionRepository.GetQuestionWithDetails(id);
             if (question == null)
             {
                 return NotFound();

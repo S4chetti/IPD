@@ -4,6 +4,10 @@ using Forum.Data.Concrete;
 using Forum.Entity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Forum.Data.Abstract; // En üste ekle
+using Forum.Data.Concrete; // En üste ekle
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -23,6 +27,7 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options => {
 .AddDefaultTokenProviders();
 
 // Giriş yapılmamışsa yönlendirilecek sayfa
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
@@ -33,7 +38,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 // Repository Tanımlamaları
 builder.Services.AddScoped<IRepository<Question>, Repository<Question>>(); // Generic olan
-builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();     // <-- YENİ EKLEDİĞİMİZ ÖZEL OLAN
+
+
 
 
 // Veritabanı Servisi
