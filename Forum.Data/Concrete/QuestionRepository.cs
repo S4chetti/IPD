@@ -25,5 +25,14 @@ namespace Forum.Data.Concrete // Namespace'e dikkat
                 .ThenInclude(c => c.User)   // Yorumu yazan kişiler
                 .FirstOrDefault();
         }
+        public List<Question> GetAllWithDetails()
+        {
+            return _context.Questions
+                .Include(x => x.User)      // Yazarı getir
+                .Include(x => x.Category)  // Kategoriyi getir
+                .Include(x => x.Comments)  // Yorum sayıları için yorumları getir
+                .OrderByDescending(x => x.CreatedDate) // En yeniler en üstte olsun
+                .ToList();
+        }
     }
 }

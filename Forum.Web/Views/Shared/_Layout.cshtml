@@ -1,4 +1,19 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using Forum.Entity.Models
+
+@inject UserManager<User> UserManager
+
+@{
+    // Giriş yapan kullanıcının tüm bilgilerini veritabanından çekiyoruz
+    User currentUser = null;
+    if (User.Identity.IsAuthenticated)
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+    }
+}
+
+
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="utf-8" />
@@ -20,21 +35,34 @@
             <nav>
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <span class="text-white me-3">Hoş geldin, @User.Identity.Name!</span>
-
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-sm btn-danger me-2">
-                            ⚙️ Yönetici Paneli
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                Hoşgeldin, @(currentUser?.Name ?? User.Identity.Name)
+                            </span>
+                            <img class="img-profile rounded-circle" src="~/sb-admin/img/undraw_profile.svg">
                         </a>
-                    }
-
-                    <a asp-controller="Account" asp-action="Logout" class="btn btn-sm btn-outline-light">Çıkış Yap</a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profilim
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/Account/Logout">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Çıkış Yap
+                            </a>
+                        </div>
+                    </li>
                 }
                 else
                 {
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-light">Giriş Yap</a>
-                    <a asp-controller="Account" asp-action="Register" class="btn btn-sm btn-outline-light ms-2">Kayıt Ol</a>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/Account/Login">Giriş Yap</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/Account/Register">Kayıt Ol</a>
+                    </li>
                 }
             </nav>
         </div>

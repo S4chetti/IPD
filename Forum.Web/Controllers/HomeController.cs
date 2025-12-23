@@ -17,9 +17,9 @@ private readonly IQuestionRepository _questionRepository; // <-- DOĞRU
         _questionRepository = questionRepository;
     }
 
-    public IActionResult Index()
+        public IActionResult Index()
         {
-            return View(_questionRepository.GetAll());
+            return View(_questionRepository.GetAllWithDetails());
         }
 
         public IActionResult Details(int id)

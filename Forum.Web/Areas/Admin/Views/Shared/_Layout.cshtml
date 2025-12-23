@@ -1,6 +1,21 @@
 ﻿<!DOCTYPE html>
 <html lang="tr">
 
+    @using Microsoft.AspNetCore.Identity
+@using Forum.Entity.Models
+
+@inject UserManager<User> UserManager
+
+@{
+        // Giriş yapan kullanıcının tüm bilgilerini veritabanından çekiyoruz
+        User currentUser = null;
+        if (User.Identity.IsAuthenticated)
+        {
+                currentUser = await UserManager.GetUserAsync(User);
+        }
+}
+
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
