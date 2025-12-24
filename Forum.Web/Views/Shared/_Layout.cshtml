@@ -36,19 +36,34 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <li class="nav-item dropdown no-arrow">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                Hoşgeldin, @(currentUser?.Name ?? User.Identity.Name)
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    @User.Identity.Name
+                                }
+                                else
+                                {
+                                    <text>Misafir</text>
+                                }
                             </span>
-                            <img class="img-profile rounded-circle" src="~/sb-admin/img/undraw_profile.svg">
+
+                            <img class="img-profile rounded-circle" src="~/img/undraw_profile.svg">
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
-                            <a class="dropdown-item" href="#">
+
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="userDropdown">
+
+                            <a class="dropdown-item" href="/Account/Profile">
                                 <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profilim
+                                Profil
                             </a>
+
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="/Account/Logout">
+
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Çıkış Yap
                             </a>
@@ -81,9 +96,31 @@
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/sb-admin/js/sb-admin-2.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ayrılmaya Hazır mısın?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Mevcut oturumunuzu sonlandırmak için "Çıkış Yap" butonuna basınız.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">İptal</button>
+                    <a class="btn btn-primary" asp-controller="Account" asp-action="Logout">Çıkış Yap</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
