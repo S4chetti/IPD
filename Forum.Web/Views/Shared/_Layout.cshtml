@@ -37,36 +37,50 @@
                 {
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                @if (User.Identity.IsAuthenticated)
-                                {
-                                    @User.Identity.Name
-                                }
-                                else
-                                {
-                                    <text>Misafir</text>
-                                }
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small font-weight-bold">
+                                @(User.Identity.IsAuthenticated? User.Identity.Name : "Misafir")
                             </span>
-
-                            <img class="img-profile rounded-circle" src="~/img/undraw_profile.svg">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <img class="img-profile rounded-circle border-2 border-primary p-1"
+                                     src="~/img/undraw_profile.svg"
+                                     style="width: 40px; height: 40px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <img class="img-profile rounded-circle" src="~/img/default-avatar.png">
+                            }
                         </a>
 
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="userDropdown">
+                        <div class="dropdown-menu dropdown-menu-end shadow-lg animated--grow-in border-0 rounded-lg p-0"
+                             aria-labelledby="userDropdown" style="min-width: 280px; overflow: hidden;">
 
-                            <a class="dropdown-item" href="/Account/Profile">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profil
-                            </a>
+                            <div class="bg-primary p-3 text-white text-center">
+                                <div class="mb-2">
+                                    <img class="img-fluid rounded-circle border border-white"
+                                         src="~/img/undraw_profile.svg"
+                                         style="width: 80px; height: 80px; object-fit: cover; border-width: 3px !important;">
+                                </div>
+                                <h6 class="font-weight-bold mb-0">@User.Identity.Name</h6>
+                                <small class="text-white-50">Üye</small>
+                            </div>
 
-                            <div class="dropdown-divider"></div>
-
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Çıkış Yap
-                            </a>
+                            <div class="p-2">
+                                <a class="dropdown-item rounded py-2 transition-3d-hover" href="/Account/Profile">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-primary"></i>
+                                    Profilimi Düzenle
+                                </a>
+                                <a class="dropdown-item rounded py-2 transition-3d-hover" href="#">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-info"></i>
+                                    Ayarlar
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item rounded py-2 text-danger transition-3d-hover" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i>
+                                    Çıkış Yap
+                                </a>
+                            </div>
                         </div>
                     </li>
                 }

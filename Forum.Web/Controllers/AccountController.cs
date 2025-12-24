@@ -2,6 +2,8 @@
 using Forum.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace Forum.Web.Controllers
 {
@@ -100,6 +102,92 @@ namespace Forum.Web.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+        }
+
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        // Constructor'a (Yapıcı Metoda) IWebHostEnvironment ekliyoruz (Resim kaydetmek için)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment webHostEnvironment)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _webHostEnvironment = webHostEnvironment;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login");
+
+            var model = new UserProfileViewModel
+            {
+                Name = user.Name,
+                Surname = user.Surname,
+                UserName = user.UserName,
+                Email = user.Email,
+                ImagePath = user.ImagePath // User tablosunda ImagePath alanı olduğunu varsayıyoruz
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Profile(UserProfileViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login");
+
+            if (ModelState.IsValid)
+            {
+                // 1. Bilgileri Güncelle
+                user.Name = model.Name;
+                user.Surname = model.Surname;
+                // Email ve Username değiştirmek istersen buraya ekleyebilirsin ama genelde ayrı süreç ister.
+
+                // 2. Resim Yükleme İşlemi
+                if (model.ImageFile != null)
+                {
+                    // Resim uzantısını al (örn: .jpg)
+                    var extension = Path.GetExtension(model.ImageFile.FileName);
+                    // Benzersiz bir isim oluştur (Guid)
+                    var newImageName = Guid.NewGuid() + extension;
+                    // Kaydedilecek klasör yolu (wwwroot/img/users)
+                    var location = Path.Combine(_webHostEnvironment.WebRootPath, "img/users");
+
+                    // Klasör yoksa oluştur
+                    if (!Directory.Exists(location))
+                        Directory.CreateDirectory(location);
+
+                    var path = Path.Combine(location, newImageName);
+
+                    // Resmi kaydet
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await model.ImageFile.CopyToAsync(stream);
+                    }
+
+                    // Eski resmi silmek istersen burada silebilirsin (isteğe bağlı)
+
+                    // Veritabanına resim yolunu kaydet
+                    user.ImagePath = "/img/users/" + newImageName;
+                }
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    TempData["Message"] = "Profiliniz başarıyla güncellendi.";
+                    return RedirectToAction("Profile");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+
+            return View(model);
         }
     }
 }
