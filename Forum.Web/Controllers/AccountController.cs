@@ -73,7 +73,7 @@ namespace Forum.Web.Controllers
                 CreatedDate = DateTime.Now,
                 ImageId = "default-profile.png" // Varsayılan resim
             };
-
+            //sd
             // CreateAsync metodu şifreyi otomatik hashler ve kaydeder
             var result = await _userManager.CreateAsync(user, model.Password);
 
