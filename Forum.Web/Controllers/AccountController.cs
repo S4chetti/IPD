@@ -12,12 +12,6 @@ namespace Forum.Web.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-        }
-
         public IActionResult Login()
         {
             return View();
@@ -123,7 +117,7 @@ namespace Forum.Web.Controllers
             var model = new UserProfileViewModel
             {
                 Name = user.Name,
-                Surname = user.Surname,
+                SurName = user.SurName,
                 UserName = user.UserName,
                 Email = user.Email,
                 ImagePath = user.ImagePath // User tablosunda ImagePath alanı olduğunu varsayıyoruz
@@ -142,7 +136,7 @@ namespace Forum.Web.Controllers
             {
                 // 1. Bilgileri Güncelle
                 user.Name = model.Name;
-                user.Surname = model.Surname;
+                user.SurName = model.Surname;
                 // Email ve Username değiştirmek istersen buraya ekleyebilirsin ama genelde ayrı süreç ister.
 
                 // 2. Resim Yükleme İşlemi

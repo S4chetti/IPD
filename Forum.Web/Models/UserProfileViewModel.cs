@@ -10,7 +10,7 @@ namespace Forum.Web.Models
 
         [Display(Name = "Soyad")]
         public string Surname { get; set; }
-
+        public string? SurName { get; internal set; }
         [Display(Name = "Kullanıcı Adı")]
         public string UserName { get; set; }
 
