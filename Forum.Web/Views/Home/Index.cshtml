@@ -34,8 +34,9 @@ else
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
 
-                    <span class="badge badge-primary">@(item.Category?.Name ?? "Genel")</span>
-
+                    <span class="badge badge-dark px-2 py-1">
+                        <i class="fas fa-layer-group mr-1"></i> @(item.Category?.Name ?? "Genel")
+                    </span>
                     <small class="text-muted">@item.CreatedDate.ToString("dd.MM.yyyy")</small>
                 </div>
                 <div class="card-body">
