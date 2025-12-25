@@ -1,52 +1,65 @@
 ﻿@model QuestionCreateViewModel
 @{
-    ViewData["Title"] = "Soru Sor";
+    ViewData["Title"] = "Yeni Konu Oluştur";
 }
 
-<div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Yeni Soru Oluştur</h6>
-            </div>
-            <div class="card-body">
-                <form asp-action="Create" method="post" enctype="multipart/form-data">
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-lg">
 
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h3 class="font-weight-bold m-0">Yeni Konu Aç</h3>
+                    <small class="text-white-50">Sorunuzu net ve anlaşılır bir şekilde ifade edin</small>
+                </div>
 
-                    <div class="form-group">
-                        <label>Soru Başlığı</label>
-                        <input asp-for="Title" class="form-control" placeholder="Sorunuzun başlığı...">
-                        <span asp-validation-for="Title" class="text-danger"></span>
-                    </div>
+                <div class="card-body p-5">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
 
-                    <div class="form-group">
-                        <label>Kategori Seçin</label>
-                        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
-                            <option value="">-- Kategori Seç --</option>
-                        </select>
-                        <span asp-validation-for="CategoryId" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Detaylı Açıklama</label>
-                        <textarea asp-for="Description" class="form-control" rows="5" placeholder="Sorunuzun detayları..."></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Görsel Ekle (Opsiyonel)</label>
-                        <div class="custom-file">
-                            <input asp-for="Image" type="file" class="custom-file-input" id="customFile">
-                            <label class="custom-file-label" for="customFile">Dosya Seç...</label>
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-dark">Konu Başlığı</label>
+                            <input type="text" class="form-control form-control-lg bg-light border-0" asp-for="Title" placeholder="Örn: C# List kullanımı hakkında soru" required>
+                            <span asp-validation-for="Title" class="text-danger small"></span>
                         </div>
-                        <span asp-validation-for="Image" class="text-danger"></span>
-                    </div>
 
-                    <button type="submit" class="btn btn-primary btn-block mt-4">
-                        <i class="fas fa-paper-plane"></i> Soruyu Gönder
-                    </button>
-                </form>
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-dark">Kategori</label>
+                            <select class="form-control form-control-lg bg-light border-0" asp-for="CategoryId" asp-items="ViewBag.Categories" required>
+                                <option value="">Bir Kategori Seçin...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-dark">Detaylı Açıklama</label>
+                            <textarea class="form-control bg-light border-0" asp-for="Description" rows="8" style="resize: none;" placeholder="Sorununuzu detaylıca buraya yazın..." required></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-dark d-block">Görsel Ekle (Opsiyonel)</label>
+
+                            <input type="file" asp-for="Image" id="fileUpload" class="d-none" accept="image/*">
+
+                            <label for="fileUpload" id="dropZone" class="d-block p-4 text-center rounded" style="border: 2px dashed #ced4da; cursor: pointer; transition: all 0.3s; background-color: #f8f9fc;">
+                                <div id="uploadContent">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                    <h6 class="text-muted mb-1">Görsel yüklemek için tıklayın</h6>
+                                    <small class="text-gray-500">JPG, PNG veya GIF</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="/" class="text-secondary text-decoration-none font-weight-bold"><i class="fas fa-arrow-left mr-1"></i> İptal</a>
+                            <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm rounded-pill font-weight-bold">
+                                Yayınla
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -54,10 +67,23 @@
 
 @section Scripts {
     <script>
-        // Dosya seçildiğinde adını label'a yazdır
-        $(".custom-file-input").on("change", function() {
-            var fileName = $(this).val().split("\\").pop();
-            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        // Dosya seçildiğinde kutunun içindeki yazıyı değiştirme scripti
+        document.getElementById('fileUpload').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                var fileName = e.target.files[0].name;
+                var contentDiv = document.getElementById('uploadContent');
+
+                // İçeriği güncelle
+                contentDiv.innerHTML = `
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h6 class="text-dark font-weight-bold mb-1">${fileName}</h6>
+                    <small class="text-success">Dosya seçildi</small>
+                `;
+
+                // Çerçeve rengini yeşil yap
+                document.getElementById('dropZone').style.borderColor = '#1cc88a'; // Success rengi
+                document.getElementById('dropZone').style.backgroundColor = '#e8fdf5';
+            }
         });
     </script>
 }
