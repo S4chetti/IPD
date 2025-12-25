@@ -9,6 +9,7 @@ namespace Forum.Entity.Models
         public string? SurName { get; set; }
         public string ImagePath { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public string? Image { get; set; }
         public string? ImageId { get; set; }
         public List<Question> Questions { get; set; }
         public List<Comment> Comments { get; set; }

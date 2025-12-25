@@ -1,4 +1,4 @@
-﻿using System; // DateTime için bu gerekli
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Forum.Entity.Models
@@ -10,9 +10,9 @@ namespace Forum.Entity.Models
         [Required]
         public string Content { get; set; }
 
-        // CreatedDate BURADA OLMALI (Sınıfın parantezleri içinde)
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.Now; // Eksik olan Tarih alanı
 
+        // İlişkiler
         public int QuestionId { get; set; }
         public Question Question { get; set; }
 

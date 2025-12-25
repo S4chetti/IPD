@@ -4,140 +4,182 @@
     ViewData["Title"] = Model.Title;
 }
 
-<div class="container mt-4">
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h5 class="m-0 font-weight-bold text-primary">@Model.Title</h5>
-
-            <span class="badge badge-primary px-3 py-2" style="font-size: 0.9rem;">
-                <i class="fas fa-tag mr-2"></i> @(Model.Category?.Name ?? "Genel")
-            </span>
-        </div>
-
-        <div class="card-body">
-            <div class="mb-4 text-muted small border-bottom pb-2">
-                <i class="fas fa-user"></i>
-                <span class="font-weight-bold text-dark mx-1">
-                    @(Model.User?.Name ?? Model.User?.UserName ?? "Misafir")
-                </span>
-                <span class="mx-2">|</span>
-                <i class="fas fa-clock"></i> @Model.CreatedDate.ToString("dd MMMM yyyy HH:mm")
-            </div>
-
-            <div class="question-content text-dark mb-4" style="font-size: 1.1rem; line-height: 1.6;">
-                @if (!string.IsNullOrEmpty(Model.Description))
-                {
-                    @Model.Description
-                }
-                else
-                {
-                    <span class="text-muted font-italic">Bu soru için açıklama girilmemiş.</span>
-                }
-            </div>
-
-            @if (!string.IsNullOrEmpty(Model.ImageName))
-            {
-                <div class="text-center mt-4 p-3 bg-light rounded border">
-                    <img src="~/img/questions/@Model.ImageName" class="img-fluid rounded shadow-sm" style="max-height: 500px;" alt="Soru Görseli">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h4 class="m-0 font-weight-bold text-primary">@Model.Title</h4>
+                    @if (Model.User != null)
+                    {
+                        <span class="badge badge-pill badge-light px-3 py-2 border">
+                            <i class="fas fa-user mr-1"></i> @(Model.User.SurName ?? Model.User.UserName)
+                        </span>
+                    }
                 </div>
-            }
-        </div>
-    </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-secondary">
-                Yorumlar / Cevaplar
-            </h6>
-        </div>
+                <div class="card-body">
+                    <div class="mb-4 text-dark" style="font-size: 1.1em; line-height: 1.6;">
+                        @Model.Description
+                    </div>
 
-        <div class="card-body" id="commentList">
-            @if (Model.Comments != null && Model.Comments.Count > 0)
-            {
-                @foreach (var comment in Model.Comments)
-                {
-                    <div class="media mb-3 pb-3 border-bottom">
-                        <img class="mr-3 rounded-circle" src="~/sb-admin/img/undraw_profile.svg" style="width:40px;">
-                        <div class="media-body">
-                            <h6 class="mt-0 font-weight-bold">
-                                @(comment.User?.Name ?? comment.User?.UserName ?? "Kullanıcı")
-                                <small class="text-muted ml-2">@comment.CreatedDate.ToString("dd.MM.yyyy HH:mm")</small>
-                            </h6>
-                            <p class="text-dark">@comment.Content</p>
+                    @if (Model.ImageName != null)
+                    {
+                        <hr />
+                        <p class="text-muted small mb-2"><i class="fas fa-search-plus"></i> Resmi büyütmek için üzerine tıklayın:</p>
+
+                        <a href="javascript:void(0);" onclick="$('#imageModal').modal('show');">
+                            <img src="~/img/questions/@Model.ImageName"
+                                 class="img-thumbnail rounded"
+                                 style="max-height: 200px; cursor: pointer; transition: transform 0.2s;"
+                                 onmouseover="this.style.transform='scale(1.05)'"
+                                 onmouseout="this.style.transform='scale(1)'"
+                                 alt="Soru Görseli">
+                        </a>
+
+                        <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                <div class="modal-content bg-transparent border-0 shadow-none">
+                                    <div class="modal-body p-0 text-center position-relative">
+                                        <button type="button" class="close text-white position-absolute" onclick="$('#imageModal').modal('hide');" style="top: -30px; right: 0; opacity: 1; font-size: 2rem;">
+                                            &times;
+                                        </button>
+                                        <img src="~/img/questions/@Model.ImageName" class="img-fluid rounded shadow-lg" alt="Büyük Görsel">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div id="noCommentAlert" class="alert alert-light text-center">
-                    Henüz yorum yapılmamış. İlk cevabı sen yaz!
+                    }
                 </div>
-            }
+                <div class="card-footer bg-light text-muted small">
+                    <i class="far fa-calendar-alt mr-1"></i> @Model.CreatedDate.ToString("dd MMMM yyyy HH:mm")
+                    <span class="mx-2">|</span>
+                    <i class="far fa-folder mr-1"></i> @(Model.Category?.Name ?? "Genel")
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-gray-100">
+                    <h5 class="mb-0 text-gray-800"><i class="fas fa-comments mr-2"></i>Yorumlar (<span id="commentCount">@(Model.Comments?.Count ?? 0)</span>)</h5>
+                </div>
+                <div class="card-body">
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="mb-5 p-4 bg-light rounded border">
+                            <h6 class="font-weight-bold text-dark mb-3">Düşüncelerini Paylaş</h6>
+                            <form id="commentForm">
+                                <input type="hidden" name="QuestionId" value="@Model.Id" />
+
+                                <div class="form-group mb-0">
+                                    <textarea name="Content" id="commentContent" class="form-control" rows="3" placeholder="Bu konuya bir cevap yazın..." required style="resize: none;"></textarea>
+                                </div>
+
+                                <div class="text-right mt-3">
+                                    <button type="submit" class="btn btn-primary btn-sm px-4 shadow-sm font-weight-bold">
+                                        <i class="fas fa-paper-plane mr-1"></i> Yorum Gönder
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center mb-4">
+                            Yorum yapabilmek için lütfen <a href="/Account/Login" class="alert-link">Giriş Yapın</a>.
+                        </div>
+                    }
+
+                    <div class="comment-list">
+                        @if (Model.Comments != null && Model.Comments.Any())
+                        {
+                            @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedDate))
+                            {
+                                <div class="media mb-4 p-3 rounded" style="background-color: #fcfcfc; border-left: 4px solid #4e73df;">
+                                    <img class="d-flex mr-3 rounded-circle shadow-sm"
+                                         src="@(comment.User?.Image ?? "https://ui-avatars.com/api/?name=" + (comment.User?.UserName ?? "U") + "&background=random")"
+                                         width="50" height="50" alt="User">
+
+                                    <div class="media-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <h6 class="mt-0 font-weight-bold text-primary">@(comment.User?.UserName ?? "Anonim")</h6>
+                                            <small class="text-muted">@comment.CreatedDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                        </div>
+                                        <div class="text-dark">
+                                            @comment.Content
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div id="no-comments" class="text-center text-muted py-4">
+                                <i class="far fa-comment-dots fa-3x mb-3 text-gray-300"></i>
+                                <p>Henüz yorum yapılmamış. İlk yorumu sen yap!</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
-
-    @if (User.Identity.IsAuthenticated)
-    {
-        <div class="card shadow mb-4">
-            <div class="card-body">
-                <h5 class="card-title">Cevap Yaz</h5>
-                <form id="commentForm">
-                    <input type="hidden" name="QuestionId" value="@Model.Id" />
-                    <div class="form-group">
-                        <textarea name="Content" id="commentContent" class="form-control" rows="4" placeholder="Düşüncelerini paylaş..." required style="resize: none;"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        Gönder
-                    </button>
-                </form>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-warning text-center shadow mb-4">
-            Yorum yapmak için <a href="/Account/Login" class="font-weight-bold">Giriş Yap</a>malısınız.
-        </div>
-    }
 </div>
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $("#commentForm").submit(function (e) {
-                e.preventDefault();
+        $(document).ready(function() {
+            $('#commentForm').submit(function(e) {
+                e.preventDefault(); // Sayfanın yenilenmesini engelle
 
-                var formData = $(this).serialize();
+                var formData = $(this).serialize(); // Formdaki verileri al
 
                 $.ajax({
-                    type: "POST",
-                    url: "/Comment/Create",
+                    url: '/Comment/Create',
+                    type: 'POST',
                     data: formData,
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success) {
-                            $("#noCommentAlert").remove();
+                            // "Henüz yorum yok" yazısını kaldır
+                            $('#no-comments').hide();
 
+                            // Yeni yorum HTML'ini oluştur
                             var newCommentHtml = `
-                                <div class="media mb-3 pb-3 border-bottom animate__animated animate__fadeIn">
-                                    <img class="mr-3 rounded-circle" src="/sb-admin/img/undraw_profile.svg" style="width:40px;">
+                                <div class="media mb-4 p-3 rounded" style="background-color: #fcfcfc; border-left: 4px solid #4e73df; display:none;">
+                                    <img class="d-flex mr-3 rounded-circle shadow-sm"
+                                         src="${response.userImage}"
+                                         width="50" height="50" alt="User">
+
                                     <div class="media-body">
-                                        <h6 class="mt-0 font-weight-bold">
-                                            ${response.userName}
-                                            <small class="text-muted ml-2">${response.date}</small>
-                                        </h6>
-                                        <p class="text-dark">${response.content}</p>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <h6 class="mt-0 font-weight-bold text-primary">${response.userName}</h6>
+                                            <small class="text-muted">${response.date}</small>
+                                        </div>
+                                        <div class="text-dark">
+                                            ${response.content}
+                                        </div>
                                     </div>
                                 </div>`;
 
-                            $("#commentList").append(newCommentHtml);
-                            $("#commentContent").val("");
+                            // Listeye ekle ve efekli göster
+                            $('.comment-list').prepend(newCommentHtml);
+                            $('.comment-list .media').first().fadeIn('slow');
+
+                            // Textarea'yı temizle
+                            $('#commentContent').val('');
+
+                            // Yorum sayısını güncelle
+                            var countSpan = $('#commentCount');
+                            var currentCount = parseInt(countSpan.text());
+                            countSpan.text(currentCount + 1);
+
                         } else {
                             alert("Hata: " + response.message);
                         }
                     },
-                    error: function () {
+                    error: function() {
                         alert("Yorum gönderilirken bir hata oluştu.");
                     }
                 });

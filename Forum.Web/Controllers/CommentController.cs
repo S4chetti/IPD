@@ -1,14 +1,10 @@
 ﻿using Forum.Data;
 using Forum.Entity.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace Forum.Web.Controllers
 {
-    [Authorize] // Sadece giriş yapanlar yorum atabilir
     public class CommentController : Controller
     {
         private readonly AppDbContext _context;
@@ -23,24 +19,28 @@ namespace Forum.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Comment comment)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if (!User.Identity.IsAuthenticated)
             {
-                // Kullanıcı yoksa JSON olarak hata dön
-                return Json(new { success = false, message = "Oturum açmalısınız." });
+                return Json(new { success = false, message = "Oturum açmanız gerekiyor." });
             }
 
+            var user = await _userManager.GetUserAsync(User);
+
+            // Yorum verilerini doldur
             comment.UserId = user.Id;
             comment.CreatedDate = DateTime.Now;
 
+            // Kaydet
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
 
-            // Sayfayı yenilemek yerine, eklenen veriyi JSON olarak geri yolluyoruz
+            // JSON Olarak Geri Dön (Sayfa yenilenmez, bu veriyi JavaScript yakalar)
             return Json(new
             {
                 success = true,
-                userName = user.Name ?? user.UserName, // Ad yoksa kullanıcı adı
+                userName = user.UserName,
+                // Kullanıcının resmi yoksa varsayılan avatar servisini kullan
+                userImage = user.Image ?? "https://ui-avatars.com/api/?name=" + user.UserName + "&background=random",
                 date = comment.CreatedDate.ToString("dd.MM.yyyy HH:mm"),
                 content = comment.Content
             });
