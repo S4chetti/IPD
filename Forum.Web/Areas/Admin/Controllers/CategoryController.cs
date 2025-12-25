@@ -1,52 +1,80 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Forum.Data;
+﻿using Forum.Data;
 using Forum.Entity.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")] // Bu kapıdan sadece Adminler geçebilir!
+    [Authorize(Roles = "Admin")] // Sadece Adminler erişebilsin
     public class CategoryController : Controller
     {
-        private readonly IRepository<Category> _categoryRepo;
+        private readonly AppDbContext _context;
 
-        public CategoryController(IRepository<Category> categoryRepo)
+        public CategoryController(AppDbContext context)
         {
-            _categoryRepo = categoryRepo;
+            _context = context;
         }
 
-        // 1. LİSTELEME SAYFASI
+        // Listeleme Sayfası
         public IActionResult Index()
         {
-            var categories = _categoryRepo.GetAll();
+            var categories = _context.Categories.ToList();
             return View(categories);
         }
 
-        // 2. EKLEME SAYFASI (Formu Göster)
-        [HttpGet]
+        // Ekleme Sayfası (GET)
         public IActionResult Create()
         {
             return View();
         }
 
-        // 2. EKLEME İŞLEMİ (Veriyi Kaydet)
+        // Ekleme İşlemi (POST)
         [HttpPost]
         public IActionResult Create(Category category)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return View(category);
+                _context.Categories.Add(category);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
             }
-
-            _categoryRepo.Add(category);
-            return RedirectToAction("Index"); // Listeye geri dön
+            return View(category);
         }
 
-        // 3. SİLME İŞLEMİ
+        // Düzenleme Sayfası (GET)
+        public IActionResult Edit(int id)
+        {
+            var category = _context.Categories.Find(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return View(category);
+        }
+
+        // Düzenleme İşlemi (POST)
+        [HttpPost]
+        public IActionResult Edit(Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Categories.Update(category);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(category);
+        }
+
+        // Silme İşlemi
         public IActionResult Delete(int id)
         {
-            _categoryRepo.Delete(id);
+            var category = _context.Categories.Find(id);
+            if (category != null)
+            {
+                _context.Categories.Remove(category);
+                _context.SaveChanges();
+            }
             return RedirectToAction("Index");
         }
     }
